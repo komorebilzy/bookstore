@@ -90,12 +90,6 @@ public:
         file.write(reinterpret_cast<const char *>(&first_index), sizeof(int));
     }
 
-//    bool compare(const Node &x, int i, int j) {          //i对应的小于j则为true
-//        if (x.unit[i].first < x.unit[j].first) return true;
-//        if (x.unit[j].first < x.unit[i].first) return false;
-//        if (x.unit[i].second < x.unit[j].second) return true;
-//        return false;
-//    }
 
     void insert(const String &key, const int &value) {
         file.open(name);
@@ -228,48 +222,3 @@ public:
 };
 
 #endif
-//#include <iostream>
-//#include <vector>
-//#include <cstdio>
-//int next_int(){
-//    int x;
-//    scanf("%d",&x);
-//    return x;
-//}
-//String next_String(){
-//    String x{};
-//    scanf("%s",x.str);
-//    return x;
-//}
-//
-//int main() {
-//    BlockList store{"data"};
-//    auto n = next_int();
-//    for(int i=0;i<n;++i) {
-//        auto order = std::string(next_String().str);
-//        if (order == "insert") {
-//            auto key = next_String();
-//            auto value = next_int();
-//            store.insert(key, value);
-//        }
-//        else if (order == "delete") {
-//            auto key = next_String();
-//            auto value = next_int();
-//            store.remove(key, value);
-//        }
-//        else if (order == "find") {
-//            auto key = next_String();
-//            auto values=store.find(key);
-//            if(values.empty()) {
-//                puts("null");
-//            }
-//            else {
-//                for(auto v:values){
-//                    std::cout<<v<<" ";
-//                }
-//                std::cout<<"\n";
-//            }
-//        }
-//    }
-//    return 0;
-//}
