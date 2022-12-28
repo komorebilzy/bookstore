@@ -7,8 +7,10 @@
 #include <vector>
 #include <fstream>
 
+
+template<int T>
 struct String {
-    char str[65];
+    char str[T];
 
     bool operator<(const String &a) const {
         return strcmp(str, a.str) < 0;
@@ -25,13 +27,44 @@ struct String {
     bool operator<=(const String &a) const {
         return (*this < a || *this == a);
     }
+
+    bool operator>(const String &a) const {
+        return strcmp(str, a.str) > 0;
+    }
+
+    bool operator>=(const String &a) const {
+        return (*this > a || *this == a);
+    }
+
+    friend std::istream &operator>>(std::istream &is, String &tmp) {
+        return is >> tmp.str;
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const String &tmp) {
+        return os << tmp.str;
+    }
+
+    String<T> &operator=(const String<T> &rhs) {
+        if (this != &rhs) { memcpy(str, rhs.str, sizeof(str)); }
+        return *this;
+    }
 };
 
+
+struct cur {
+    String<32> UserID;
+    int privilege;
+    String<22> ISBN;
+    bool selected = false;
+} current{};
+
+
+template<class M, int T>
 class BlockList {
     static const int max = 800;
 
     struct Node {
-        std::pair<String, int> unit[max];
+        std::pair<String<T>, M> unit[max];
         int siz;
         int my_num;
         int next_num;
@@ -91,7 +124,7 @@ public:
     }
 
 
-    void insert(const String &key, const int &value) {
+    void insert(const String<T> &key, const M &value) {
         file.open(name);
         read_basic();
         readNode(head, first_index);
@@ -145,7 +178,7 @@ public:
         file.close();
     }
 
-    void remove(const String &key, const int &value) {
+    void remove(const String<T> &key, const M &value) {
         file.open(name);
         read_basic();
         readNode(head, first_index);
@@ -190,9 +223,9 @@ public:
         file.close();
     }
 
-    std::vector<int> find(const String &key) {
+    std::vector<M> find(const String<T> &key) {
         file.open(name);
-        std::vector<int> ans;
+        std::vector<M> ans;
         ans.clear();
         read_basic();
         readNode(head, first_index);
@@ -214,6 +247,97 @@ public:
             }
             if (flag == 1) break;
             if (key < p->unit[0].first) break;
+            *p = *q;
+        }
+        file.close();
+        return ans;
+    }
+
+    void change(const String<T> &key, M value, const String<T> &new_key, M new_value) {
+        remove(key, value);
+        insert(new_key, new_value);
+//        file.open(name);
+//        read_basic();
+//        readNode(head, first_index);
+//        Node *p = &head;
+//        Node temp;
+//        Node *q = &temp;
+//        int flag = 0;      //标记最后一个元素
+//        while (true) {                      //找块
+//            if (p->next_num == 0) flag = 1;
+//            else readNode(*q, p->next_num);
+//            if ((p->unit[0].first <= key && key <= q->unit[0].first) || flag == 1) {
+//                for (int i = 0; i < p->siz; ++i) {                  //块内寻找
+//                    if (p->unit[i].first == key && p->unit[i].second == value) {   //找到了
+//                        p->unit[i].first=new_key;
+//                        p->unit[i].second=new_value;
+//                        writeNode(*p,p->my_num);
+//                    }
+//                }
+//            }
+//            if (key < p->unit[0].first || (key == p->unit[0].first && value < p->unit[0].second)) break;
+//            if (flag == 1) break;
+//            *p = *q;
+//        }
+//        file.close();
+    }
+
+    std::vector<M> show(const std::string &key) {
+        file.open(name);
+        std::vector<M> ans;
+        ans.clear();
+        read_basic();
+        readNode(head, first_index);
+        Node *p = &head;
+        Node temp;
+        Node *q = &temp;
+        int flag = 0;      //标记最后一个元素
+        while (true) {                      //找块
+            if (p->next_num == 0) flag = 1;
+            else {
+                readNode(*q, p->next_num);
+            }
+            for (int i = 0; i < p->siz; ++i) {                  //块内寻找
+                std::string tmp,keyword="";
+               tmp=std::string (p->unit[i].first.str);
+                for(int k=0;k<tmp.size();++k){
+                    if(tmp[k]!='|') keyword+=tmp[k];
+                    else {
+                        if(keyword==key) {
+                            ans.push_back(p->unit[i].second);
+                            break;
+                        }
+                        keyword="";
+                        continue;
+                    }
+                }
+            }
+            if (flag == 1) break;
+            *p = *q;
+        }
+        file.close();
+        return ans;
+    }
+
+    std::vector<M> show_all(){
+        file.open(name);
+        std::vector<M> ans;
+        ans.clear();
+        read_basic();
+        readNode(head, first_index);
+        Node *p = &head;
+        Node temp;
+        Node *q = &temp;
+        int flag = 0;      //标记最后一个元素
+        while (true) {                      //找块
+            if (p->next_num == 0) flag = 1;
+            else {
+                readNode(*q, p->next_num);
+            }
+            for (int i = 0; i < p->siz; ++i) {                  //块内寻找
+                ans.push_back(p->unit[i].second);
+            }
+            if (flag == 1) break;
             *p = *q;
         }
         file.close();
