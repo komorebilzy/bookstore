@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 #include <fstream>
-
+#include <stack>
 
 template<int T>
 struct String {
@@ -56,8 +56,9 @@ struct cur {
     int privilege;
     String<22> ISBN;
     bool selected = false;
+    int index;
 } current{};
-
+std::stack<cur> log;
 
 template<class M, int T>
 class BlockList {
@@ -300,8 +301,8 @@ public:
             for (int i = 0; i < p->siz; ++i) {                  //块内寻找
                 std::string tmp,keyword="";
                tmp=std::string (p->unit[i].first.str);
-                for(int k=0;k<tmp.size();++k){
-                    if(tmp[k]!='|') keyword+=tmp[k];
+                for(int k=0;k<tmp.size()+1;++k){
+                    if(tmp[k]!='|'&&tmp[k]!='\0') keyword+=tmp[k];
                     else {
                         if(keyword==key) {
                             ans.push_back(p->unit[i].second);
