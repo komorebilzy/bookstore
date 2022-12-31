@@ -6,17 +6,7 @@
 #include <fstream>
 #include <cstring>
 int main() {
-//    std::fstream f;
-//    f.open("book_name",std::fstream::trunc);
-//    f.open("book_isbn",std::fstream::trunc);
-//    f.open("book_detail",std::fstream::trunc);
-//    f.open("book_keyword",std::fstream::trunc);
-//    f.open("book_author",std::fstream::trunc);
-//    f.open("bookstore",std::fstream::trunc);
-//    f.open("account_name",std::fstream::trunc);
-//    f.open("account_detail",std::fstream::trunc);
-//    return 0;
-//    freopen("advanced/testcase1/2.in","r",stdin);
+    freopen("myout","r",stdin);
 //    freopen("myout","w",stdout);
 //    int timer=0;
     visitor *m;
@@ -30,12 +20,8 @@ int main() {
     }
     in.close();
     std::string order;
-    while(order != "quit" && order!= "exit") {
-//        timer++;
-//        if(timer==59){
-//            std::cout<<' ';
-//        }
-        std::cin>>order;
+    while(std::cin>>order) {
+        if(std::cin.eof()) return 0;
         std::string tmp1,tmp2,tmp3;
         if (order == "su") {
             std::cin>>tmp1;
@@ -67,16 +53,16 @@ int main() {
                 std::cin>>tmp[i];
                 ++i;
             }
-            if(i<3) {
+            if(i!=3) {
                 std::cout<<"Invalid\n";
                 continue;
             }
-            if(i>3){
-                for(int j=3;j<i;++j){
-                    tmp[2]+=" ";
-                    tmp[2]+=tmp[j];
-                }
-            }
+//            if(i>3){
+//                for(int j=3;j<i;++j){
+//                    tmp[2]+=" ";
+//                    tmp[2]+=tmp[j];
+//                }
+//            }
             m->Register(tmp[0].c_str(), tmp[1].c_str(), tmp[2].c_str());
         }else if(order=="passwd"){
             std::cin>>tmp1>>tmp2;
@@ -144,7 +130,9 @@ int main() {
             m->select(tmp1.c_str());
         }else if(order=="modify"){
             if(!current.selected||current.privilege<=1||log.empty()) {
-                getline(std::cin,tmp1);
+                while(std::cin.get()!='\n'){
+                    std::cin>>tmp1;
+                }
                 std::cout<<"Invalid\n";
                 continue;
             }

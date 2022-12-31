@@ -333,7 +333,7 @@ public:
             }
         }
         printf("+ %.2f ", count_in);
-        printf(" - %.2f\n", count_out);
+        printf("- %.2f\n", count_out);
     }
 
 
