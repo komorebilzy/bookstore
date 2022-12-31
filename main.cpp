@@ -6,7 +6,7 @@
 #include <fstream>
 #include <cstring>
 int main() {
-    freopen("myout","r",stdin);
+//    freopen("myout","r",stdin);
 //    freopen("myout","w",stdout);
 //    int timer=0;
     visitor *m;
