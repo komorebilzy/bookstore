@@ -28,9 +28,32 @@ public:
     const char *filename = "book_detail";
     std::fstream book_detail;
     int index = 0;
-    std::stack<double> count;
+    std::fstream count_buy,count_import;
+    int index1=0,index2=0;
 
     book() {
+        std::ifstream in1("count_buy");
+        if (!in1) {
+            std::ofstream out1("count_buy");
+            out1.close();
+            count_buy.open("count_buy");
+            count_buy.seekp(0);
+            count_buy.write(reinterpret_cast<char *>(&index1), sizeof(int));
+            count_buy.close();
+        }
+        in1.close();
+
+        std::ifstream in2("count_import");
+        if (!in2) {
+            std::ofstream out2("count_import");
+            out2.close();
+            count_import.open("count_buy");
+            count_import.seekp(0);
+            count_import.write(reinterpret_cast<char *>(&index2), sizeof(int));
+            count_import.close();
+        }
+        in2.close();
+
         std::ifstream in(filename);
         if (!in) {
             std::ofstream out(filename);
@@ -301,7 +324,13 @@ public:
                 if (quantity_ <= detail.quantity) {
                     detail.quantity -= quantity_;
                     write_book(isbnn.back(), detail);
-                    count.push(quantity_ * detail.price);
+                    double total=quantity_ * detail.price;
+                    count_buy.open("count_buy",std::fstream::ate);
+                    count_buy.write(reinterpret_cast<const char *>(&total),sizeof(double));
+                    index1++;
+                    count_buy.seekp(0);
+                    count_buy.write(reinterpret_cast<const char*>(&index1),sizeof(int));
+                    count_buy.close();
                     printf("%.2f\n", quantity_ * detail.price);
                     return;
                 }
@@ -319,26 +348,57 @@ public:
                 detail.quantity += quantity_;
                 detail.totalCost += totalCost_;
                 write_book(index_, detail);
-                count.push(-totalCost_);
+                count_import.open("count_import",std::fstream::ate);
+                count_import.write(reinterpret_cast<const char *>(&totalCost_),sizeof(double));
+                index2++;
+                count_import.seekp(0);
+                count_import.write(reinterpret_cast<const char*>(&index2),sizeof(int));
+                count_import.close();
             }
         } else std::cout << "Invalid\n";
     }
 
     void show_finance(int &count_) {
         double count_in = 0, count_out = 0;
-        std::stack<double> tmp_count(count);
+        double tmp;
         if (count_ == 0) {
-            for (int i = 0; i < count.size(); ++i) {
-                if (tmp_count.top() > 0) count_in += tmp_count.top();
-                else count_out -= tmp_count.top();
-                tmp_count.pop();
+            count_buy.open("count_buy");
+            count_buy.seekg(0);
+            count_buy.read(reinterpret_cast<char*>(&index1),sizeof(int));
+            for(int i=0;i<index1;++i){
+                count_buy.seekg(i*sizeof(double)+sizeof(int));
+                count_buy.read(reinterpret_cast<char*>(&tmp),sizeof(double));
+                count_in+=tmp;
             }
+            count_buy.close();
+            count_import.open("count_import");
+            count_import.seekg(0);
+            count_import.read(reinterpret_cast<char*>(&index2),sizeof(int));
+            for(int i=0;i<index2;++i){
+                count_import.seekg(i*sizeof(double)+sizeof(int));
+                count_import.read(reinterpret_cast<char*>(&tmp),sizeof(double));
+                count_out+=tmp;
+            }
+            count_import.close();
         } else {
-            for (int i = 0; i < count_; ++i) {
-                if (tmp_count.top() > 0) count_in += tmp_count.top();
-                else count_out -= tmp_count.top();
-                tmp_count.pop();
+            count_buy.open("count_buy");
+            count_buy.seekg(0);
+            count_buy.read(reinterpret_cast<char*>(&index1),sizeof(int));
+            for(int i=index1-count_;i<index1;++i){
+                count_buy.seekg(i*sizeof(double)+sizeof(int));
+                count_buy.read(reinterpret_cast<char*>(&tmp),sizeof(double));
+                count_in+=tmp;
             }
+            count_buy.close();
+            count_import.open("count_import");
+            count_import.seekg(0);
+            count_import.read(reinterpret_cast<char*>(&index2),sizeof(int));
+            for(int i=index2-count_;i<index2;++i){
+                count_import.seekg(i*sizeof(double)+sizeof(int));
+                count_import.read(reinterpret_cast<char*>(&tmp),sizeof(double));
+                count_out+=tmp;
+            }
+            count_import.close();
         }
         printf("+ %.2f ", count_in);
         printf("- %.2f\n", count_out);

@@ -7,6 +7,8 @@
 #include <cstring>
 int main() {
 //    int timer=0;
+//    freopen("4.in","r",stdin);
+//    freopen("myout","w",stdout);
     visitor *m;
     visitor v;customer c;worker w;boss b;
     m=&b;
