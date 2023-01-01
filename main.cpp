@@ -7,7 +7,7 @@
 #include <cstring>
 int main() {
 //    int timer=0;
-//    freopen("4.in","r",stdin);
+//    freopen("3.in","r",stdin);
 //    freopen("myout","w",stdout);
     visitor *m;
     visitor v;customer c;worker w;boss b;
@@ -106,7 +106,7 @@ int main() {
                 std::cin >> tmp1;
                 if(tmp1=="finance") {
                     char b=std::cin.get();
-                    if(b=='\n') m->show_finance(0);
+                    if(b=='\n') m->show_finance(-1);
                     else {
                         int tmp4;
                         std::cin>>tmp4;
