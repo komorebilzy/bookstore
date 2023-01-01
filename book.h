@@ -35,6 +35,10 @@ public:
         if (!in) {
             std::ofstream out(filename);
             out.close();
+            book_detail.open(filename);
+            book_detail.seekp(0);
+            book_detail.write(reinterpret_cast<char *>(&index), sizeof(int));
+            book_detail.close();
         }
         in.close();
         book_detail.open(filename);
@@ -145,19 +149,23 @@ public:
 
 
     void read_book(int index_, detailed &detail_) {
-        book_detail.seekg((index_-1) * sizeof(detailed));
+        book_detail.seekg((index_-1) * sizeof(detailed)+sizeof(int));
         book_detail.read(reinterpret_cast<char *>(&detail_), sizeof(detailed));
     }
 
     void write_book(int index_, const detailed &detail_) {
-        book_detail.seekp((index_-1) * sizeof(detailed));
+        book_detail.seekp((index_-1) * sizeof(detailed)+sizeof(int));
         book_detail.write(reinterpret_cast<const char *>(&detail_), sizeof(detailed));
     }
 
     void select(const char *isbn_) {
         strcpy(isbn.str, isbn_);
         if (book_isbn.find(isbn).empty()) {
+            book_detail.seekg(0);
+            book_detail.read(reinterpret_cast<char*>(&index),sizeof(int));
             index++;
+            book_detail.seekp(0);
+            book_detail.write(reinterpret_cast<const char*>(&index),sizeof(int));
             book_isbn.insert(isbn, index);
             detailed tmp{};
             tmp.isbn = isbn;

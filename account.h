@@ -25,22 +25,27 @@ public :
     BlockList<int, 32> account_name{"account_name"};
     const char *filename = "account_detail";
     std::fstream account_detail;
+
     visitor() {
         std::ifstream in(filename);
         if (!in) {
             std::ofstream out(filename);
             out.close();
+            account_detail.open(filename);
+            account_detail.seekp(0);
+            account_detail.write(reinterpret_cast<char *>(&index), sizeof(int));
+            account_detail.close();
         }
         in.close();
     }
 
     void read_account(int index_, detailed &detail_) {
-        account_detail.seekg((index_ - 1) * sizeof(detailed));
+        account_detail.seekg((index_ - 1) * sizeof(detailed)+sizeof(int));
         account_detail.read(reinterpret_cast<char *>(&detail_), sizeof(detailed));
     }
 
     void write_account(int index_, const detailed &detail_) {
-        account_detail.seekp((index_ - 1) * sizeof(detailed));       //存帐户所有信息
+        account_detail.seekp((index_ - 1) * sizeof(detailed)+sizeof(int));       //存帐户所有信息
         account_detail.write(reinterpret_cast<const char *>(&detail_), sizeof(detailed));
     }
 
@@ -55,7 +60,11 @@ public :
             strcpy(detail.PassWord.str, password);
             strcpy(detail.UserName.str, username);
             detail.privilege = 1;
+            account_detail.seekg(0);
+            account_detail.read(reinterpret_cast<char*>(&index),sizeof(int));
             index++;
+            account_detail.seekp(0);
+            account_detail.write(reinterpret_cast<const char *>(&index), sizeof(int));
             write_account(index, detail);
             account_name.insert(UserID, index);        //存id到所有信息的映射
         } else std::cout << "Invalid\n";
@@ -209,7 +218,11 @@ public:
                 strcpy(detail.PassWord.str, password_);
                 strcpy(detail.UserName.str, username_);
                 detail.privilege = privilege_;
+                account_detail.seekg(0);
+                account_detail.read(reinterpret_cast<char*>(&index),sizeof(int));
                 index++;
+                account_detail.seekp(0);
+                account_detail.write(reinterpret_cast<const char *>(&index), sizeof(int));
                 write_account(index, detail);
                 account_name.insert(UserID, index);
                 account_detail.close();
